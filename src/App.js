@@ -6,6 +6,17 @@ import './App.css';
 const TWITTER_HANDLE = '_buildspace';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
+// Test GIFS
+
+const TEST_GIFS = [
+  'https://media.giphy.com/media/9zXWAIcr6jycE/giphy.gif',
+  'https://media.giphy.com/media/3Fdskc7J0timI/giphy.gif',
+  'https://media.giphy.com/media/liBsVeLILcyaY/giphy.gif',
+  'https://media.giphy.com/media/cgW5iwX0e37qg/giphy.gif',
+  'https://media.giphy.com/media/8Ry7iAVwKBQpG/giphy.gif',
+  'https://media.giphy.com/media/rOTGSPxvJJY7m/giphy.gif',
+];
+
 const App = () => {
   // State
   const [walletAddress, setWalletAddress] = useState(null);
@@ -53,6 +64,18 @@ const App = () => {
     </button>
   );
 
+  const renderConnectedContainer = () => (
+    <div className="connected-container">
+      <div className="gif-grid">
+        {TEST_GIFS.map((gif) => (
+          <div className="gif-item" key={gif}>
+            <img src={gif} alt={gif} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   useEffect(() => {
     const onLoad = async () => {
       await checkIfWalletIsConnected();
@@ -70,6 +93,7 @@ const App = () => {
             View your GIF collection in the metaverse ✨
           </p>
           {!walletAddress && renderNotConnectedContainer()}
+          {walletAddress && renderConnectedContainer()}
         </div>
         <div className="footer-container">
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
