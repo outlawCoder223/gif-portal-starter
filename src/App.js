@@ -10,7 +10,7 @@ import kp from './keypair.json';
 const TWITTER_HANDLE = '_buildspace';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
-const { SystemProgram, Keypair } = web3;
+const { SystemProgram } = web3;
 
 const arr = Object.values(kp._keypair.secretKey);
 const secret = new Uint8Array(arr);
