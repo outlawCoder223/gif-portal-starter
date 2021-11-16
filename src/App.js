@@ -3,26 +3,18 @@ import twitterLogo from './assets/twitter-logo.svg';
 import './App.css';
 import idl from './idl.json';
 import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js';
-import { getProvider, Program, Provider, web3 } from '@project-serum/anchor';
+import { Program, Provider, web3 } from '@project-serum/anchor';
+import kp from './keypair.json';
 
 // Constants
 const TWITTER_HANDLE = '_buildspace';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
-// Test GIFS
-
-const TEST_GIFS = [
-  'https://media.giphy.com/media/9zXWAIcr6jycE/giphy.gif',
-  'https://media.giphy.com/media/3Fdskc7J0timI/giphy.gif',
-  'https://media.giphy.com/media/liBsVeLILcyaY/giphy.gif',
-  'https://media.giphy.com/media/cgW5iwX0e37qg/giphy.gif',
-  'https://media.giphy.com/media/8Ry7iAVwKBQpG/giphy.gif',
-  'https://media.giphy.com/media/rOTGSPxvJJY7m/giphy.gif',
-];
-
 const { SystemProgram, Keypair } = web3;
 
-let baseAccount = Keypair.generate();
+const arr = Object.values(kp._keypair.secretKey);
+const secret = new Uint8Array(arr);
+const baseAccount = web3.Keypair.fromSecretKey(secret);
 
 const programID = new PublicKey(idl.metadata.address);
 
@@ -73,10 +65,27 @@ const App = () => {
   };
 
   const sendGif = async () => {
-    if (inputValue.length > 0) {
-      console.log('Gif link:', inputValue);
-    } else {
-      console.log('Empty input. Try again.');
+    if (inputValue.length === 0) {
+      console.log('No GIF given');
+      return;
+    }
+
+    console.log('GIF link: ', inputValue);
+
+    try {
+      const provider = getProvider();
+      const program = new Program(idl, programID, provider);
+
+      await program.rpc.addGif(inputValue, {
+        accounts: {
+          baseAccount: baseAccount.publicKey,
+          user: provider.wallet.publicKey,
+        },
+      });
+      console.log('GIF successfully sent to program: ', inputValue);
+      await getGifList();
+    } catch (e) {
+      console.log('Error sending GIFs', e);
     }
   };
 
@@ -161,9 +170,9 @@ const App = () => {
             </button>
           </form>
           <div className="gif-grid">
-            {gifList.map((gif) => (
-              <div className="gif-item" key={gif}>
-                <img src={gif} alt={gif} />
+            {gifList.map((item, idx) => (
+              <div className="gif-item" key={idx}>
+                <img src={item.gifLink} alt={item.gifLink} />
               </div>
             ))}
           </div>
